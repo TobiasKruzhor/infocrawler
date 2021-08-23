@@ -1,33 +1,16 @@
 from flask import Flask, render_template
 import sqlite3
-import crawler
+from crawler import datapro, spider
 
 
 app = Flask(__name__)
 
 
+
 @app.route('/')
 def index():
-    numlist = []
-    con = sqlite3.connect("info.db")
-    cur = con.cursor()
-    sql1 = "SELECT COUNT(*) FROM info"
-    num1 = cur.execute(sql1)
-    numlist.append(num1)
-
-    sql2 = "SELECT COUNT(id) FROM info WHERE info_ava > 0"
-    num2 = cur.execute(sql2)
-    numlist.append(num2)
-
-    sql3 = "SELECT COUNT(id) FROM info WHERE info_progress = 1"
-    num3 = cur.execute(sql3)
-    numlist.append(num3)
-
-    sql4 = "SELECT COUNT(id) FROM info WHERE info_progress = 2"
-    num4 = cur.execute(sql4)
-    numlist.append(num4)
-    cur.close()
-    con.close()
+    dbpath = "info.db"
+    numlist = datapro.stats(dbpath)
     return render_template("index.html", nums=numlist)
 
 
@@ -43,15 +26,8 @@ def home():
 
 @app.route('/allInfo')
 def allInfo():
-    datalist = []
-    con = sqlite3.connect("info.db")
-    cur = con.cursor()
-    sql = "select * from info order by info_date desc"
-    data = cur.execute(sql)
-    for item in data:
-        datalist.append(item)
-    cur.close()
-    con.close()
+    dbpath = "info.db"
+    datalist = datapro.allinfos(dbpath)
     return render_template("allInfo.html", infos=datalist)
 
 
